@@ -1,19 +1,23 @@
 # /usr/bin/env python
 #-*-coding=utf-8-*-
 
-import os,sys
+import os,sys,configparser
 
-agentIp		  = ('root:10.10.72.104:22022','root:10.10.72.103:22022') #ssh的 用户名:ip:port
 
-debug 		  = True
-logservername = 'logstash'
+cf = configparser.ConfigParser()
+cf.read("elk.ini")
+
+agentIp = cf.get("AGENT","REMOTELOCATION").split(",")
+logservername = cf.get("EKL","LSNAME")
 
 # 创建服务端和客户端的logstash文件
-REDISHOST		= '127.0.0.1'
-REDISPORT		= '6379'
-REDISKEY		= 'logstash'
-ESHOST			= '127.0.0.1'
-REMOTELOGPATH	= '/var/logs/nginx/access.log'
+REDISHOST = cf.get("REDIS","HOST")
+REDISPORT = cf.get("REDIS","PORT")
+REDISKEY  = cf.get("REDIS","KEY")
+
+ESHOST = cf.get("EKL","ESHOST")
+REMOTELOGPATH = cf.get("AGENT","REMOTELOGPATH")
+
 
 logstash_agent = '\n\
 input {\n\
@@ -129,7 +133,7 @@ for ip in agentIp:
 def clearIndex( days = 30 ):
 	url = 'http://localhost:9200/logstash-';
 	# 每次只删除一天的
-	delurl = url + 
+	#delurl = url + 
 
 
 
